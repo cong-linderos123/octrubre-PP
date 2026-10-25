@@ -1,0 +1,682 @@
+﻿
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#b9d9e9">
+<title>Programa de Predicación Pública</title>
+
+<style>
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #18212b;
+  font-size: 16px;
+  --neon: #102a91;
+  --card: rgba(244,251,255,.92);
+}
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg,#f2f4f6,#dce6ec,#a9cedf);
+  background-attachment: fixed;
+}
+.container { max-width: 1180px; margin: auto; padding: 22px; }
+
+.toolbar {
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+}
+
+button {
+  border:2px solid var(--neon);
+  border-radius:9px;
+  padding:10px 15px;
+  background:linear-gradient(135deg,#70d1f7,#37afe9);
+  color:#10264b;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 0 8px #1739b45c;
+  transition:transform .18s,box-shadow .18s;
+}
+button:hover { transform:translateY(-2px); }
+
+h1 {
+  margin:0;
+  padding:20px 12px;
+  text-align:center;
+  color:#07539a;
+  font-size:clamp(1.2rem,3vw,1.8rem);
+  font-weight:900;
+  text-transform:uppercase;
+  background:linear-gradient(135deg,#fafdff,#c9eaff);
+  border:3px solid var(--neon);
+  border-radius:15px;
+  box-shadow:0 0 12px #1436a34d,0 8px 24px #25334218;
+}
+
+h2 { color:#12345b; }
+
+.today {
+  margin:20px 0 28px;
+  border:3px solid var(--neon);
+  border-radius:16px;
+  overflow:hidden;
+  background:var(--card);
+  box-shadow:0 0 13px #1739b452,0 12px 28px #25334220;
+}
+
+.today-label {
+  text-align:center;
+  padding:12px;
+  background:linear-gradient(90deg,#d7f3ff,#a7e0ff,#d7f3ff);
+  color:#103c78;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+
+.today h2 {
+  margin:0;
+  padding:14px;
+  text-align:center;
+  background:linear-gradient(90deg,#8cdbfa,#49b9ee,#8cdbfa);
+  color:#12345b;
+  border-block:2px solid var(--neon);
+  text-transform:uppercase;
+  font-size:1.15rem;
+}
+
+.font-controls {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:40px;
+  max-width:100%;
+  padding:5px 10px;
+  background:linear-gradient(135deg,#e4f5ff,#b8e5fa);
+  border:2px solid var(--neon);
+  border-radius:12px;
+}
+
+.font-label {
+  flex:0 0 auto;
+  color:#12345b;
+  font-size:12px;
+  font-weight:900;
+}
+.font-label-big { font-size:21px; }
+
+#fontSlider {
+  display:block;
+  width:7cm;
+  min-width:7cm;
+  height:18px;
+  padding:0;
+  margin:0;
+  accent-color:#1739db;
+  cursor:ew-resize;
+}
+#fontValue {
+  min-width:48px;
+  color:#12345b;
+  font-size:12px;
+  font-weight:900;
+}
+
+.voice-control {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-weight:700;
+}
+
+.toolbar select {
+  max-width:260px;
+  border:2px solid var(--neon);
+  border-radius:8px;
+  padding:9px 10px;
+  background:#f5fbff;
+  color:#18212b;
+  font:inherit;
+}
+
+.schedule {
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  background:#f4fbff;
+}
+
+.schedule th,.schedule td {
+  border:1px solid #25468c;
+  padding:7px 8px;
+  text-align:center;
+  font-size:clamp(.76rem,1.6vw,.98rem);
+  line-height:1.25;
+  font-weight:700;
+}
+
+.schedule td {
+  color:#142a40;
+  overflow-wrap:anywhere;
+}
+
+.schedule th {
+  background:#72cef3;
+  color:#12345b;
+  text-transform:uppercase;
+}
+
+.schedule .time-row td {
+  background:#83d8f8;
+  color:#12345b;
+  text-transform:uppercase;
+}
+
+.schedule .peach td { background:#c6eaff; }
+.schedule .sky td { background:#a9e0fa; }
+.schedule .gray td { background:#d2edfa; }
+.schedule .light td { background:#e4f4fc; }
+
+.schedule .no-preaching {
+  color:#c01832;
+  font-weight:900;
+}
+
+.day-heading {
+  margin:0 0 14px;
+  padding:13px 16px;
+  background:linear-gradient(90deg,#8ddafa,#b8e9fc);
+  color:#12345b;
+  border:3px solid var(--neon);
+  border-radius:11px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+
+.day-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));
+  gap:18px;
+}
+
+.day-card {
+  min-width:0;
+  overflow:hidden;
+  background:var(--card);
+  border:3px solid var(--neon);
+  border-radius:14px;
+  box-shadow:0 0 12px #1739b452,0 8px 22px #25334220;
+}
+
+.day-card h3 {
+  margin:0;
+  padding:13px 15px;
+  background:linear-gradient(90deg,#b7eaff,#6acbf4,#b7eaff);
+  color:#12345b;
+  border-bottom:2px solid var(--neon);
+  text-align:center;
+  text-transform:uppercase;
+  font-size:1rem;
+}
+
+#listenButton {
+  display:block;
+  margin:16px auto 18px;
+  padding:12px 20px;
+}
+
+.missing-info {
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
+}
+
+body.dark {
+  background:linear-gradient(135deg,#18232d,#203541,#294958) fixed;
+  color:#f3f8ff;
+}
+
+.dark h2 { color:#e9f8ff; }
+
+.dark .today,.dark .day-card,.dark h1 {
+  background:#253b49;
+  color:#f3f8ff;
+  border-color:#294fff;
+}
+
+.dark h1 {
+  background:linear-gradient(135deg,#253b49,#31566b);
+  color:#effaff;
+}
+
+.dark .day-heading {
+  background:#25485b;
+  color:#e9f8ff;
+  border-color:#294fff;
+}
+
+.dark .today-label {
+  background:#31566b;
+  color:#effaff;
+}
+
+.dark .today h2,.dark .day-card h3 {
+  background:linear-gradient(90deg,#397fa2,#55b9e6,#397fa2);
+  color:white;
+}
+
+.dark .toolbar select {
+  background:#253b49;
+  color:#f3f8ff;
+  border-color:#5474ff;
+}
+
+.dark .font-controls {
+  background:#294958;
+  border-color:#5474ff;
+}
+
+.dark .font-label,.dark #fontValue { color:white; }
+
+.dark .schedule td { color:#10263b; }
+.dark .schedule .time-row td { color:#10294a; }
+
+@media(max-width:600px) {
+  .container { padding:12px; }
+  .toolbar { justify-content:center; }
+  .toolbar select { width:100%; max-width:none; }
+  .font-controls { width:100%; overflow-x:auto; }
+  .day-grid { grid-template-columns:1fr; }
+
+  .schedule th,.schedule td {
+    padding:6px 4px;
+    font-size:.74rem;
+  }
+
+  .today { margin:14px 0 22px; }
+}
+</style>
+</head>
+
+<body>
+<main class="container">
+
+  <div class="toolbar">
+    <div class="font-controls" aria-label="Tamaño de letra">
+      <span class="font-label">A</span>
+      <input type="range" id="fontSlider"
+        min="8" max="96" step="0.1" value="16">
+      <span class="font-label font-label-big">A</span>
+      <output id="fontValue">100%</output>
+    </div>
+
+    <label class="voice-control">Voz
+      <select id="voiceSelect">
+        <option value="auto">Automática</option>
+      </select>
+    </label>
+
+    <button id="themeButton" type="button">Modo oscuro</button>
+  </div>
+
+  <h1>Predicación Pública Congregación Linderos</h1>
+
+  <section class="today" aria-live="polite">
+    <div class="today-label">PROGRAMA DE HOY</div>
+    <div id="todayContent"></div>
+    <button id="listenButton" type="button">🔊 Escuchar programa</button>
+  </section>
+
+  <h2 class="day-heading">Programa semanal</h2>
+  <section class="day-grid" id="weekGrid"></section>
+
+</main>
+
+<script>
+'use strict';
+
+/* PROGRAMA SEMANAL */
+const programa = [
+  {date:'2026-10-26',day:'Lunes',items:[
+    ['09:30 a 11:30','Casa Hna Doris','Doris Salazar','Adriana Gonzalez','light']
+  ]},
+  {date:'2026-10-27',day:'Martes',items:[
+    ['07:30 a 09:00','Colegio Cardenal R. Silva H.','Betysabeht de Jachura','Yasmina de Condores','peach'],
+    ['','Colegio Tec. Don Bosco','Sin PP','Sin PP','peach'],
+    ['09:00 a 11:00','Departamentos lado A. Neghme','Virginia Céspedes','Erika Castro','gray'],
+    ['','Departamentos lado A. Lagos','Sin PP','Sin PP','gray'],
+    ['09:30 a 11:30','Casa Hna Doris','Doris Salazar','Pabla de Cifuentes','light']
+  ]},
+  {date:'2026-10-28',day:'Miércoles',items:[
+    ['09:30 a 11:30','A. Neghme/Cancha Rayada','Ángel Medina','Eduardo Poo','sky'],
+    ['','A. Neghme/Cancha Rayada','Héctor Cárcamo','Nestor Usquiano','sky'],
+    ['','Casa Hna Doris','Doris Salazar','Mery Ramirez','light']
+  ]},
+  {date:'2026-10-29',day:'Jueves',items:[
+    ['07:30 a 09:00','Colegio Cardenal R. Silva H.','Karen Fook','Antonia Cárcamo','peach'],
+    ['','Colegio Tec. Don Bosco','Sin PP','Sin PP','peach'],
+    ['09:00 a 11:00','Departamentos lado A. Neghme','Virginia Céspedes','Erika Castro','gray'],
+    ['','Departamentos lado A. Lagos','Sin PP','Sin PP','gray'],
+    ['09:30 a 11:30','Casa Hna Doris','Doris Salazar','Ivone de Mamani','light']
+  ]},
+  {date:'2026-10-30',day:'Viernes',items:[
+    ['09:30 a 11:30','A. Neghme/Cancha Rayada','Mario Roco','Eleodoro Veas','sky'],
+    ['','A. Neghme/Cancha Rayada','Marina Cano','Ivette de Guerrero','sky'],
+    ['','Casa Hna Doris','Doris Salazar','Tomasa Ramos','light']
+  ]},
+  {date:'2026-10-31',day:'Sábado',items:[
+    ['08:00 a 10:00','Neghme/Robinson Rojas','Isabel Mamani','Rut de Cortez','sky'],
+    ['09:30 a 11:30','Cementerio Parque de la Paz','Fernanda de Manzano','Nicole de Piñones','peach'],
+    ['10:00 a 12:00','Plaza Mejillones/Linderos','Sin PP','Sin PP','sky']
+  ]}
+];
+
+/* FECHA Y HORA DE CHILE */
+function datosHoraChile() {
+  const partes = new Intl.DateTimeFormat('en-GB', {
+    timeZone:'America/Santiago',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit',
+    hour:'2-digit',
+    hourCycle:'h23'
+  }).formatToParts(new Date());
+
+  const resultado = {};
+
+  partes.forEach(parte => {
+    if (parte.type !== 'literal') {
+      resultado[parte.type] = parte.value;
+    }
+  });
+
+  return resultado;
+}
+
+/* DESDE LAS 13:00, USAR LA FECHA DE MAÑANA */
+function fechaProgramaIso() {
+  const ahora = datosHoraChile();
+
+  const fecha = new Date(Date.UTC(
+    Number(ahora.year),
+    Number(ahora.month) - 1,
+    Number(ahora.day)
+  ));
+
+  if (Number(ahora.hour) >= 13) {
+    fecha.setUTCDate(fecha.getUTCDate() + 1);
+  }
+
+  return [
+    fecha.getUTCFullYear(),
+    String(fecha.getUTCMonth() + 1).padStart(2,'0'),
+    String(fecha.getUTCDate()).padStart(2,'0')
+  ].join('-');
+}
+
+function esProgramaDeManana() {
+  return Number(datosHoraChile().hour) >= 13;
+}
+
+function fmtDate(iso) {
+  return new Intl.DateTimeFormat('es-CL',{
+    day:'2-digit',
+    month:'2-digit',
+    year:'numeric',
+    timeZone:'UTC'
+  }).format(new Date(iso+'T12:00:00Z'));
+}
+
+function nombreDiaDesdeISO(iso) {
+  return new Intl.DateTimeFormat('es-CL',{
+    weekday:'long',
+    timeZone:'UTC'
+  }).format(new Date(iso+'T12:00:00Z'));
+}
+
+function escaparHTML(texto) {
+  return String(texto).replace(/[&<>"']/g,caracter => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  })[caracter]);
+}
+
+function renderRows(items) {
+  let filas = '';
+  let horaActual = '';
+
+  for (const item of items) {
+    const [hora,lugar,a,b,color] = item;
+
+    if (color === 'header') {
+      filas += '<tr class="time-row"><td colspan="4">HERMANO/A</td></tr>';
+      continue;
+    }
+
+    if (hora) horaActual = hora;
+
+    filas += `<tr class="${escaparHTML(color)}">
+      <td>${escaparHTML(hora || horaActual)}</td>
+      <td>${escaparHTML(lugar)}</td>
+      <td class="${a==='Sin PP'?'no-preaching':''}">${escaparHTML(a)}</td>
+      <td class="${b==='Sin PP'?'no-preaching':''}">${escaparHTML(b)}</td>
+    </tr>`;
+  }
+
+  return filas;
+}
+
+function makeTable(day) {
+  return `<table class="schedule">
+    <thead><tr>
+      <th>Horario</th>
+      <th>Lugar</th>
+      <th>Hermano/a</th>
+      <th>Hermano/a</th>
+    </tr></thead>
+    <tbody>${renderRows(day.items)}</tbody>
+  </table>`;
+}
+
+function renderPrograma() {
+  const esManana = esProgramaDeManana();
+  const fecha = fechaProgramaIso();
+  const dia = programa.find(x => x.date === fecha);
+
+  document.querySelector('.today-label').textContent =
+    esManana ? 'PROGRAMA DE MAÑANA' : 'PROGRAMA DE HOY';
+
+  document.getElementById('todayContent').innerHTML = dia
+    ? `<h2>${dia.day} · ${fmtDate(dia.date)}</h2>${makeTable(dia)}`
+    : `<h2>${nombreDiaDesdeISO(fecha)} · ${fmtDate(fecha)}</h2>
+       <p class="missing-info">No hay información guardada para este día.</p>`;
+
+  document.getElementById('weekGrid').innerHTML = programa.map(day =>
+    `<article class="day-card">
+      <h3>${day.day} · ${fmtDate(day.date)}</h3>
+      ${makeTable(day)}
+    </article>`
+  ).join('');
+}
+
+renderPrograma();
+
+/* ACTUALIZAR AUTOMÁTICAMENTE CADA 30 SEGUNDOS */
+setInterval(renderPrograma, 30000);
+
+/* LECTOR DE VOZ */
+const selectorVoz = document.getElementById('voiceSelect');
+let vocesEspanol = [];
+
+function actualizarSelectorVoces() {
+  if (!('speechSynthesis' in window)) return;
+
+  const voces = speechSynthesis.getVoices();
+
+  vocesEspanol = voces.filter(voz =>
+    voz.lang && voz.lang.toLowerCase().startsWith('es')
+  );
+
+  const seleccionAnterior = selectorVoz.value || 'auto';
+
+  selectorVoz.innerHTML =
+    '<option value="auto">Automática</option>' +
+    vocesEspanol.map((voz, indice) =>
+      `<option value="${indice}">${escaparHTML(voz.name)} · ${escaparHTML(voz.lang)}</option>`
+    ).join('');
+
+  const guardada = localStorage.getItem('vozPredicacion') || seleccionAnterior;
+
+  if (
+    guardada === 'auto' ||
+    (Number.isInteger(Number(guardada)) &&
+     Number(guardada) >= 0 &&
+     Number(guardada) < vocesEspanol.length)
+  ) {
+    selectorVoz.value = guardada;
+  } else {
+    selectorVoz.value = 'auto';
+  }
+}
+
+if ('speechSynthesis' in window) {
+  actualizarSelectorVoces();
+  speechSynthesis.addEventListener('voiceschanged', actualizarSelectorVoces);
+}
+
+selectorVoz.addEventListener('change', () => {
+  localStorage.setItem('vozPredicacion', selectorVoz.value);
+});
+
+function hablar(texto) {
+  if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+    alert('Tu navegador no admite la lectura por voz. Prueba con Microsoft Edge o Google Chrome.');
+    return;
+  }
+
+  const mensaje = new SpeechSynthesisUtterance(texto);
+  const voces = speechSynthesis.getVoices();
+
+  vocesEspanol = voces.filter(voz =>
+    voz.lang && voz.lang.toLowerCase().startsWith('es')
+  );
+
+  let voz = null;
+
+  if (selectorVoz.value === 'auto') {
+    voz =
+      vocesEspanol.find(v => v.lang.toLowerCase() === 'es-cl') ||
+      vocesEspanol.find(v => v.lang.toLowerCase() === 'es-es') ||
+      vocesEspanol[0] ||
+      null;
+  } else {
+    voz = vocesEspanol[Number(selectorVoz.value)] || null;
+  }
+
+  mensaje.lang = voz ? voz.lang : 'es-CL';
+  mensaje.rate = 0.9;
+  mensaje.pitch = 1;
+  mensaje.volume = 1;
+
+  if (voz) mensaje.voice = voz;
+
+  mensaje.onstart = () => {
+    console.log('La lectura del programa comenzó.');
+  };
+
+  mensaje.onend = () => {
+    console.log('La lectura del programa terminó.');
+  };
+
+  mensaje.onerror = evento => {
+    console.error('Error de lectura por voz:', evento.error);
+  };
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(mensaje);
+}
+
+function leerProgramaDeHoy() {
+  const esManana = esProgramaDeManana();
+  const fecha = fechaProgramaIso();
+  const dia = programa.find(x => x.date === fecha);
+
+  if (!dia || !dia.items.length) {
+    hablar(
+      `Atención. No hay información guardada para el programa de ${esManana ? 'mañana' : 'hoy'}.`
+    );
+    return;
+  }
+
+  const detalle = dia.items.map(([hora,lugar,hermanoA,hermanoB]) => {
+    const horario = hora ? `${hora}. ` : '';
+
+    if (hermanoA === 'Sin PP' && hermanoB === 'Sin PP') {
+      return `${horario}${lugar}. No hay predicación programada en este lugar.`;
+    }
+
+    return `${horario}${lugar}. Participan ${hermanoA} y ${hermanoB}.`;
+  }).join(' ');
+
+  hablar(
+    `Programa de predicación pública de ${esManana ? 'mañana' : 'hoy'}, ${dia.day}, ${fmtDate(dia.date)}. ${detalle}`
+  );
+}
+
+document.getElementById('listenButton').addEventListener('click', leerProgramaDeHoy);
+
+/* MODO OSCURO */
+document.getElementById('themeButton').addEventListener('click', e => {
+  document.body.classList.toggle('dark');
+
+  const oscuro = document.body.classList.contains('dark');
+
+  localStorage.setItem(
+    'temaPredicacion',
+    oscuro ? 'oscuro' : 'claro'
+  );
+
+  e.currentTarget.textContent = oscuro ? 'Modo claro' : 'Modo oscuro';
+});
+
+if (localStorage.getItem('temaPredicacion') === 'oscuro') {
+  document.body.classList.add('dark');
+  document.getElementById('themeButton').textContent = 'Modo claro';
+}
+
+/* TAMAÑO DE LETRA */
+const fontSlider = document.getElementById('fontSlider');
+const fontValue = document.getElementById('fontValue');
+
+function aplicarTamanoLetra() {
+  const n = Number(fontSlider.value);
+
+  document.documentElement.style.fontSize = n + 'px';
+  fontValue.textContent = Math.round(n / 16 * 100) + '%';
+
+  localStorage.setItem('tamanoLetraPredicacion', fontSlider.value);
+}
+
+fontSlider.value = Math.min(
+  96,
+  Math.max(
+    8,
+    Number(localStorage.getItem('tamanoLetraPredicacion')) || 16
+  )
+);
+
+aplicarTamanoLetra();
+fontSlider.addEventListener('input', aplicarTamanoLetra);
+</script>
+</body>
+</html>
